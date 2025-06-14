@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # MySQL 루트 비밀번호
+      MYSQL_DATABASE: ${MYSQL_DATABASE}           # 기본 생성할 데이터베이스 이름
+      MYSQL_USER: ${MYSQL_USER}                   # 사용자 이름
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}           # 사용자 비밀번호
+      TZ: Asia/Seoul                              # 타임존 설정
+    ports:
+      - "3307:3306"                               # 호스트 포트 3307 -> 컨테이너 포트 3306
+    volumes:
+      - ./mysql/data:/var/lib/mysql               # 데이터 퍼시스턴스를 위한 볼륨
+      - ./mysql/conf.d:/etc/mysql/conf.d          # MySQL 설정 파일
+      - ./mysql/initdb:/docker-entrypoint-initdb.d # 초기화 SQL 스크립트
+    command: [
+      "--character-set-server=utf8mb4",           # 문자 셋 설정
+      "--collation-server=utf8mb4_general_ci"     # 문자 정렬 설정
+    ]

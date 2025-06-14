@@ -1,0 +1,36 @@
+server:
+  port: 8090
+
+spring:
+  config:
+    import: optional:file:.env[.properties] # ???? ?? ??
+  output:
+    ansi:
+      enabled: always # ANSI ?? ?? ??? (JUnit ??? ??)
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+
+
+  jpa:
+    open-in-view: false # controller ?? ????? ??? ? false? ??
+    hibernate:
+      ddl-auto: update # ??? ?? ? ???? ?? (create, create-drop, update, validate, none)
+    properties:
+      hibernate:
+        format_sql: true # SQL ???
+        highlight_sql: true # ????? SQL ??
+        use_sql_comments: true # ?? JPQL SQL ?? ??
+
+
+logging:
+  level:
+    #    org.springframework.security.web: trace
+    #    org.hibernate: info # Hibernate? ?? ??? info? ??
+    org.hibernate.SQL: debug # Hibernate? SQL? ??
+    org.hibernate.orm.jdbc.bind: trace # Hibernate? SQL ???? ??
+    org.hibernate.orm.jdbc.extract: trace # Hibernate? SQL ???? ??
+    org.springframework.transaction.interceptor: trace # Hibernate? SQL ???? ??
