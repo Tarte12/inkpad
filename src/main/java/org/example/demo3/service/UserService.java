@@ -1,5 +1,6 @@
 package org.example.demo3.service;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
@@ -31,6 +32,11 @@ public class UserService {
         //유저 db에서 findall = 모든 걸 조회하겠다?
     }
 
+    //Controller에서 findById를 가져올 수 있어야 함
+    public Optional<User> findById(Long id){
+        return userRepository.findById(id);
+    }
+
     @Transactional
     public  void update(Long id, String username, String email, String password){
         //수정 로직
@@ -40,7 +46,7 @@ public class UserService {
         //왜 여기에선 user 객체를 만드는 거임? 일단 db에서 해당 id에 맞는 데이터를 가져오는 명령어 같음
         //근데 orElseThrow()는 왜 있는 거임?
         user.update(username, email, password);
-        //id를 입력하고 내가 원하면 user, email, password 중에 골라서 수정하는 로직은 어떻게?
+        //이거 그냥 User.java에 있는 update메서드 가져오겠다는 거임
     }
 
     public void delete(Long id){
@@ -48,4 +54,5 @@ public class UserService {
         userRepository.deleteById(id);
         //회원 정보 db에서 통으로 지우겠다?
     }
+
 }

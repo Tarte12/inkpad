@@ -15,14 +15,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final ResourceUrlProvider mvcResourceUrlProvider;
     //컨트롤러에서 서비스를 호출하는 코드인지?
     //밑줄 생기던 거 UserService 가서 @Service 어노테이션 붙여서 해결
 
     @PostMapping //Post HTTP 메서드와 연결(생성 요청 처리)
     //Post Http가 생성 관련 메서드? create가 생성 담당인지?
     public ResponseEntity<User> create(@RequestBody User user){
-        return ResponseEntity.ok(UserService.create(user));
+        return ResponseEntity.ok(userService.create(user));
         //Service한테 넘기겠다는 뜻인지? create 빨간줄은 왜 생기는지
 
     }
@@ -30,7 +29,7 @@ public class UserController {
     @GetMapping //전체 조회 요청 처리
     //ResponseEntity가 뭔지, findAll()이 뭔지
     public ResponseEntity<List<User>> findAll() {
-        return ResponseEntity.ok(UserService.findAll());
+        return ResponseEntity.ok(userService.findAll());
         //ResponseEntity가 뭐 하는 애인지 그냥 감만 잡힘
         //findall로 전체를 호출하겠다는 뜻인가?
 
