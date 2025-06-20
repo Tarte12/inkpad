@@ -5,7 +5,6 @@ import org.example.demo3.domain.user.User;
 import org.example.demo3.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 import java.util.List;
 
