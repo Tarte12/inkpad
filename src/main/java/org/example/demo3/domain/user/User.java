@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class User {
 
@@ -22,8 +21,8 @@ public class User {
     //post.java보고 따라 만든 건데 builder의 역할이 뭔지 모르겠음
     //update랑 비슷하게 생겼고, builder랑 update랑 생성자랑 뭐가 다른 건데?
     //lombok이 뭔데?
-    @Builder
-    public User(Long id, String username, String email, String){
+
+    public User(Long id, String username, String email, String password){
         this.id = id;
         this.username = username;
         this.email = email;
