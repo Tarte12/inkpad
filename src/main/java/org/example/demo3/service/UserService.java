@@ -45,7 +45,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 없음"));
         //왜 여기에선 user 객체를 만드는 거임? 일단 db에서 해당 id에 맞는 데이터를 가져오는 명령어 같음
         //근데 orElseThrow()는 왜 있는 거임?
-        user.update(username, email, password);
+        user.update(id);
         //이거 그냥 User.java에 있는 update메서드 가져오겠다는 거임
     }
 

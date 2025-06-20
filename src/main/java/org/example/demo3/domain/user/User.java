@@ -29,7 +29,8 @@ public class User {
         this.password = password;
     }
 
-    public void update(String username, String email, String password) {
+    public void update(Long id) {
+
         this.username = username;
         this.email = email;
         this.password = password;
