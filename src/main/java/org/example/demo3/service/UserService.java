@@ -34,9 +34,11 @@ public class UserService {
     @Transactional
     public  void update(Long id, String username, String email, String password){
         //수정 로직
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저 없음"));
         //왜 여기에선 user 객체를 만드는 거임? 일단 db에서 해당 id에 맞는 데이터를 가져오는 명령어 같음
-        //근데 orElseThrow()는 왜 있느 거임?
+        //근데 orElseThrow()는 왜 있는 거임?
         user.update(username, email, password);
         //id를 입력하고 내가 원하면 user, email, password 중에 골라서 수정하는 로직은 어떻게?
     }
