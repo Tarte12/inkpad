@@ -5,12 +5,14 @@ import org.example.demo3.domain.user.User;
 import org.example.demo3.domain.user.dto.UserResponseDto;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @RestController //컨트롤러 설정
 @RequiredArgsConstructor //이거 어디에 쓰는 거임?
@@ -29,16 +31,16 @@ public class UserController {
 
     }
 
-    @GetMapping //전체 조회 요청 처리(ResponseDto 사용)
-    //ResponseEntity가 뭔지, findAll()이 뭔지
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        List<User> users = userService.findAll();
-        List<UserResponseDto> response = users.stream()
-                .map(UserResponseDto::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+    //페이징을 써서 전체 회원 목록 조회를 할 수 있게 수정
+    @GetMapping("/page")
+    public ResponseEntity<Page<UserResponseDto>> findAllPaged(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
+        Page<User> userPage = userService.findAll(pageable);
+        Page<UserResponseDto> responsePage = userPage.map(UserResponseDto::new);
+        return ResponseEntity.ok(responsePage);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {

@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.repository.UserRepository;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,11 +26,11 @@ public class UserService {
         //근데 왜 postservice랑 다르게 save에 빨간줄이 생기지?
     }
 
-    public List<User> findAll(){
-        //전체 조희
-        //findAll()이 뭔지?
-        return userRepository.findAll();
-        //유저 db에서 findall = 모든 걸 조회하겠다?
+    //전체 조회를 페이징으로 할 것
+    //jpa가 알아서 페이징 만들어 놔서 service에선 그냥 그거 땡겨와서 쓰는 코드만 작성
+    public Page<User> findAll(Pageable pageable){
+        return userRepository.findAll(pageable);
+
     }
 
     //Controller에서 findById를 가져올 수 있어야 함
