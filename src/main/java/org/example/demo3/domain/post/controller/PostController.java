@@ -1,9 +1,9 @@
-package org.example.demo3.controller;
+package org.example.demo3.domain.post.controller;
 
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.post.Post;
-import org.example.demo3.service.PostService;
+import org.example.demo3.domain.post.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,10 +1,9 @@
-package org.example.demo3.service;
+package org.example.demo3.domain.user.service;
 
-import aj.org.objectweb.asm.commons.Remapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
-import org.example.demo3.repository.UserRepository;
+import org.example.demo3.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

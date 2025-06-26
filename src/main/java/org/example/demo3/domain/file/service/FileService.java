@@ -1,9 +1,9 @@
-package org.example.demo3.service;
+package org.example.demo3.domain.file.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
-import org.example.demo3.repository.FileRepository;
+import org.example.demo3.domain.file.repository.FileRepository;
 import org.springframework.stereotype.Service;
 //실제 파일 업로드를 위해 추가
 

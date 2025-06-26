@@ -1,8 +1,8 @@
-package org.example.demo3.controller;
+package org.example.demo3.domain.file.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
-import org.example.demo3.service.FileService;
+import org.example.demo3.domain.file.service.FileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package org.example.demo3.repository;
+package org.example.demo3.domain.file.repository;
 
 import org.example.demo3.domain.file.File;
 import org.springframework.data.jpa.repository.JpaRepository;

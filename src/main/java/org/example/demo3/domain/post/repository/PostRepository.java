@@ -1,4 +1,4 @@
-package org.example.demo3.repository;
+package org.example.demo3.domain.post.repository;
 
 import org.example.demo3.domain.post.Post;
 import org.springframework.data.jpa.repository.JpaRepository;

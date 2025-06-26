@@ -1,9 +1,9 @@
-package org.example.demo3.service;
+package org.example.demo3.domain.post.service;
 
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.post.Post;
-import org.example.demo3.repository.PostRepository;
+import org.example.demo3.domain.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
