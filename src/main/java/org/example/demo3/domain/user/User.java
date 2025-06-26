@@ -6,33 +6,34 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String username;
-
+    private String password;
+    private String nickname;
     private String email;
 
-    private String password;
+    //DB에 최종적으로 "바꾼 값"을 반영할 때 엔티티 내부에서 실행하는 메서드
+    public void update(String password, String nickname, String email) {
 
-    //post.java보고 따라 만든 건데 builder의 역할이 뭔지 모르겠음
-    //update랑 비슷하게 생겼고, builder랑 update랑 생성자랑 뭐가 다른 건데?
-    //lombok이 뭔데?
-
-    public User(Long id, String username, String email, String password){
-        this.id = id;
-        this.username = username;
-        this.email = email;
         this.password = password;
+        this.nickname = nickname;
+        this.email = email;
     }
 
-    public void update(Long id) {
-
-        this.username = username;
-        this.email = email;
+    //회원 정보 수정을 위한 changeXXX() 메서드
+    public void changePassword(String password) {
         this.password = password;
     }
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
 }

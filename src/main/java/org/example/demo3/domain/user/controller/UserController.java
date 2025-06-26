@@ -2,11 +2,15 @@ package org.example.demo3.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
+import org.example.demo3.domain.user.dto.UserResponseDto;
+import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController //컨트롤러 설정
 @RequiredArgsConstructor //이거 어디에 쓰는 거임?
@@ -25,41 +29,33 @@ public class UserController {
 
     }
 
-    @GetMapping //전체 조회 요청 처리
+    @GetMapping //전체 조회 요청 처리(ResponseDto 사용)
     //ResponseEntity가 뭔지, findAll()이 뭔지
-    public ResponseEntity<List<User>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
-        //ResponseEntity가 뭐 하는 애인지 그냥 감만 잡힘
-        //findall로 전체를 호출하겠다는 뜻인가?
+    public ResponseEntity<List<UserResponseDto>> findAll() {
+        List<User> users = userService.findAll();
+        List<UserResponseDto> response = users.stream()
+                .map(UserResponseDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
 
     }
 
     @GetMapping("/{id}")
-    // 단건 조회 요청 처리 => id로 해당 id만 조회하겠다는 의미인지?
-    // 그렇다면 닉네임 같은 걸로 조최하는 방법은?
-    public ResponseEntity<User> findById(@PathVariable Long id){
-        //findById가 뭔지, @PathVariable이 뭔지?
-        return  userService.findById(id)
-                .map(ResponseEntity::ok)
+    public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {
+        Optional<User> user = userService.findById(id);
+        return user.map(value -> ResponseEntity.ok(new UserResponseDto(value)))
                 .orElse(ResponseEntity.notFound().build());
-        //얘는 왜 findById로 안 끝나고 뒤에 두 줄이나 붙는 거임?
     }
 
     @PutMapping("/{id}")
-    public  ResponseEntity<Void> update(@PathVariable Long id, @RequestBody User user){
-        //수정 요청 HTTP 메서드가 Put인지
-        //왜 여기는 Void를 넣고, id user를 다 매개변수로 받는지?
-        userService.update(id, user.getUsername(), user.getEmail(), user.getPassword());
-        //이렇게 바꾸면 다 수정할 수 있는지?
-        return  ResponseEntity.ok().build();
-        //return 문장이 뭘 의미하는 건지?
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody UserUpdateDto dto) {
+        userService.update(id, dto);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public  ResponseEntity<Void> delete(@PathVariable long id){
-        //삭제 요청 처리
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
-        return  ResponseEntity.noContent().build();
-        //return문이 뭘 의미하는 건지?
+        return ResponseEntity.noContent().build();
     }
 }

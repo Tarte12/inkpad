@@ -3,7 +3,9 @@ package org.example.demo3.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
+import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.repository.UserRepository;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,21 +39,27 @@ public class UserService {
     }
 
     @Transactional
-    public  void update(Long id, String username, String email, String password){
+    public  void update(Long id, UserUpdateDto dto){
         //수정 로직
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 없음"));
-        //왜 여기에선 user 객체를 만드는 거임? 일단 db에서 해당 id에 맞는 데이터를 가져오는 명령어 같음
-        //근데 orElseThrow()는 왜 있는 거임?
-        user.update(id);
-        //이거 그냥 User.java에 있는 update메서드 가져오겠다는 거임
+
+        // ❗ 조건 분기: null이 아닐 때만 업데이트
+        if (dto.getPassword() != null) {
+            user.changePassword(dto.getPassword());
+        }
+        if (dto.getNickname() != null) {
+            user.changeNickname(dto.getNickname());
+        }
+        if (dto.getEmail() != null) {
+            user.changeEmail(dto.getEmail());
+        }
     }
 
-    public void delete(Long id){
-        //삭제 로직
+
+    public void delete(Long id) {
         userRepository.deleteById(id);
-        //회원 정보 db에서 통으로 지우겠다?
     }
 
 }
