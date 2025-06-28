@@ -2,6 +2,8 @@ package org.example.demo3.domain.post;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.demo3.domain.user.User;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +21,11 @@ public class Post {
     private String content;
 
     private LocalDateTime createdAt;
+
+    //user랑 연관관계 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Builder
     public Post(String title, String content) {
