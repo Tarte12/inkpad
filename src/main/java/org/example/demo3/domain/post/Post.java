@@ -28,7 +28,9 @@ public class Post {
     private User user;
 
     @Builder
-    public Post(String title, String content) {
+    public Post(User user, String title, String content) {
+
+        this.user = user;
         this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now();
