@@ -1,0 +1,60 @@
+server:
+  port: 8090
+
+spring:
+  config:
+    import:
+    - optional:file:.env[.properties] # ???? ?? ??
+    - optional:classpath:.env[.properties]
+  output:
+    ansi:
+      enabled: always # ANSI ?? ?? ??? (JUnit ??? ??)
+  #파일 용량
+  servlet:
+    multipart:
+      max-file-size: 50MB #파일 하나당 최대 크기
+      max-request-size: 100MB #요청 전체의 최대 크기
+      # S3 써서 저장 용량 해결해야 할 듯?
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/test?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+
+
+  jpa:
+    open-in-view: false # controller ?? ????? ??? ? false? ??
+    hibernate:
+      ddl-auto: update # ??? ?? ? ???? ?? (create, create-drop, update, validate, none)
+    properties:
+      hibernate:
+        format_sql: true # SQL ???
+        highlight_sql: true # ????? SQL ??
+        use_sql_comments: true # ?? JPQL SQL ?? ??
+
+
+logging:
+  level:
+    #    org.springframework.security.web: trace
+    #    org.hibernate: info # Hibernate? ?? ??? info? ??
+    org.hibernate.SQL: debug # Hibernate? SQL? ??
+    org.hibernate.orm.jdbc.bind: trace # Hibernate? SQL ???? ??
+    org.hibernate.orm.jdbc.extract: trace # Hibernate? SQL ???? ??
+    org.springframework.transaction.interceptor: trace # Hibernate? SQL ???? ??
+
+file:
+  upload-dir: uploads/
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+    region:
+      static: ${CLOUD_AWS_REGION_STATIC}
+    stack:
+      auto: false
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+
