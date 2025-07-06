@@ -1,5 +1,6 @@
 package org.example.demo3.domain.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
 import org.example.demo3.domain.user.dto.UserRequestDto;
@@ -26,10 +27,10 @@ public class UserController {
 
     @PostMapping //Post HTTP 메서드와 연결(생성 요청 처리)
     //Post Http가 생성 관련 메서드? create가 생성 담당인지?
-    public ResponseEntity<UserResponseDto> create(@RequestBody UserRequestDto dto){
+    public ResponseEntity<UserResponseDto> create(@Valid @RequestBody UserRequestDto dto){
         User saveUser = userService.create(dto);
         return ResponseEntity.ok(new UserResponseDto(saveUser));
-        //Service한테 넘기겠다는 뜻인지? create 빨간줄은 왜 생기는지
+
 
     }
 
@@ -52,7 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody UserUpdateDto dto) {
+    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDto dto) {
         userService.update(id, dto);
         return ResponseEntity.ok().build();
     }

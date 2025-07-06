@@ -6,6 +6,8 @@ import org.example.demo3.domain.user.User;
 import org.example.demo3.domain.user.dto.UserRequestDto;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.repository.UserRepository;
+import org.example.demo3.global.exception.BlogException;
+import org.example.demo3.global.exception.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +52,7 @@ public class UserService {
         //수정 로직
         User user = userRepository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저 없음"));
+                .orElseThrow(() -> new BlogException(ErrorCode.USER_NOT_FOUND));
 
         // ❗ 조건 분기: null이 아닐 때만 업데이트
         if (dto.getPassword() != null) {
