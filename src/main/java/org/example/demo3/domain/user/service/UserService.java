@@ -3,6 +3,7 @@ package org.example.demo3.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
+import org.example.demo3.domain.user.dto.UserRequestDto;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -18,8 +19,14 @@ public class UserService {
     private  final UserRepository userRepository;
     //repository에서 db 땡겨와야 해서 쓰는 코드인지?
 
-    public User create(User user){
-        //저장 로직
+    public User create(UserRequestDto dto){
+        User user = User.builder()
+                .username(dto.getUsername())
+                .password(dto.getPassword()) // 실무라면 passwordEncoder.encode(dto.getPassword())!
+                .nickname(dto.getNickname())
+                .email(dto.getEmail())
+                .build();
+
         return userRepository.save(user);
         //그러면 이게 jpa를 썼을 때 save 명렬어를 쓰면 user 정보를 저장하고,
         //이게 create 역할이랑 같은 거라 그냥 이 코드만 치면 되는 거임?

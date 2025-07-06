@@ -2,6 +2,7 @@ package org.example.demo3.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
+import org.example.demo3.domain.user.dto.UserRequestDto;
 import org.example.demo3.domain.user.dto.UserResponseDto;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.service.UserService;
@@ -25,8 +26,9 @@ public class UserController {
 
     @PostMapping //Post HTTP 메서드와 연결(생성 요청 처리)
     //Post Http가 생성 관련 메서드? create가 생성 담당인지?
-    public ResponseEntity<User> create(@RequestBody User user){
-        return ResponseEntity.ok(userService.create(user));
+    public ResponseEntity<UserResponseDto> create(@RequestBody UserRequestDto dto){
+        User saveUser = userService.create(dto);
+        return ResponseEntity.ok(new UserResponseDto(saveUser));
         //Service한테 넘기겠다는 뜻인지? create 빨간줄은 왜 생기는지
 
     }
