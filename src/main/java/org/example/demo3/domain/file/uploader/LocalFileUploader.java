@@ -2,10 +2,15 @@ package org.example.demo3.domain.file.uploader;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
+import org.example.demo3.global.util.ImageResizeUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,28 +22,47 @@ public class LocalFileUploader implements FileUploader {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    @Value("${uploader.local-base-url}")
+    private String localBaseUrl;
+
     @Override
     public File storeFile(MultipartFile multipartFile) throws IOException {
-        // 1. original filename
+        ImageIO.scanForPlugins();
         String originalFilename = multipartFile.getOriginalFilename();
-
-        // 2. UUID + 확장자
         String uuid = UUID.randomUUID().toString();
-        String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String storedFilename = uuid + ext;
+        String storedFilename = uuid + ".webp";
+        String fullPath = uploadDir + storedFilename;
 
-        // 3. 실제 저장 경로
-        String fullPath = uploadDir + storedFilename;  // ← 경로도 수정
-        multipartFile.transferTo(new java.io.File(fullPath));
+        byte[] bytes;
+        String contentType;
 
-        // 4. File 엔티티 반환
+        if (multipartFile.getContentType() != null && multipartFile.getContentType().startsWith("image")) {
+            BufferedImage resizedImage = ImageResizeUtil.resize(multipartFile, 1080);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            boolean written = ImageIO.write(resizedImage, "webp", os);
+            if (!written) {
+                throw new IOException("WebP 변환 실패: ImageIO.write 실패");
+            }
+            bytes = os.toByteArray();
+            contentType = "image/webp";
+        } else {
+            bytes = multipartFile.getBytes();
+            contentType = multipartFile.getContentType();
+        }
+
+        java.io.File outputFile = new java.io.File(fullPath);
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(outputFile)) {
+            fos.write(bytes);
+        }
+
         return File.builder()
                 .originalFilename(originalFilename)
                 .storedFilename(storedFilename)
                 .filePath(fullPath)
-                .size(multipartFile.getSize())
-                .contentType(multipartFile.getContentType())
+                .size((long) bytes.length)
+                .contentType(contentType)
                 .uploadedAt(LocalDateTime.now())
+                .url(localBaseUrl + "/uploads/" + storedFilename)  // ✅ CDN 또는 프론트에서 접근 가능한 URL
                 .build();
     }
 }

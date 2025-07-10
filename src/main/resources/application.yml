@@ -5,7 +5,7 @@ spring:
   config:
     import:
     - optional:file:.env[.properties] # ???? ?? ??
-    - optional:classpath:.env[.properties]
+
   output:
     ansi:
       enabled: always # ANSI ?? ?? ??? (JUnit ??? ??)
@@ -49,12 +49,20 @@ file:
 cloud:
   aws:
     credentials:
-      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
-      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
     region:
-      static: ${CLOUD_AWS_REGION_STATIC}
-    stack:
-      auto: false
+      static: ${AWS_REGION}
     s3:
-      bucket: ${CLOUD_AWS_S3_BUCKET}
+      bucket: ${S3_BUCKET}
+
+# ✅ S3FileUploader 등록 여부 제어
+uploader:
+  s3:
+    enabled: true #local로 바꿀 떄 false
+  local-base-url: http://localhost:8090
+
+#이미지 최적화를 위한 CDN 관련
+cloudfront:
+  url: https://dpawjnwrq42z8.cloudfront.net
 

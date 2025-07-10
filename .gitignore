@@ -40,3 +40,6 @@ out/
 .vscode/
 
 .env
+
+# QueryDSL Q클래스 경로
+/src/main/generated/

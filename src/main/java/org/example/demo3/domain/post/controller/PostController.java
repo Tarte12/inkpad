@@ -27,13 +27,16 @@ public class PostController {
     // 1. 글 작성
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Void> createPost(
-            @Valid @RequestPart("post") PostRequestDto postDto,
+            @RequestPart("post") String postJson, // JSON 문자열
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws Exception {
-        Long mockUserId = 1L; // TODO: 추후 Security 인증 정보로 교체
-        postService.createPost(mockUserId, postDto, files); // ✅ userId 추가
+        Long mockUserId = 1L;
+
+        PostRequestDto postDto = objectMapper.readValue(postJson, PostRequestDto.class);
+        postService.createPost(mockUserId, postDto, files);
         return ResponseEntity.ok().build();
     }
+
 
     // 2. 전체 글 조회
     @GetMapping

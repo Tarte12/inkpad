@@ -14,14 +14,16 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class FileService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(".jpg", ".jpeg", ".png", ".webp");
 
-    @Qualifier("s3FileUploader") // 또는 "localFileUploader"
     private final FileUploader fileUploader;
+
+    public FileService(FileUploader fileUploader) {
+        this.fileUploader = fileUploader;
+    }
 
     public File storeFile(MultipartFile multipartFile) throws IOException {
         validateFile(multipartFile);
@@ -39,3 +41,4 @@ public class FileService {
         }
     }
 }
+

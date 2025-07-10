@@ -4,12 +4,24 @@ import org.example.demo3.domain.file.File;
 
 public class FileResponseDto {
     private final String originalFilename;
-    private final String storedFilename;  //필요하면 프론트에서 다운로드 구분용
-    private final String url;
+    private final String storedFilename;
+    private final String url;  // ✅ S3/CloudFront or Local/Cloudflare 등 실제 접근 경로
 
     public FileResponseDto(File file) {
         this.originalFilename = file.getOriginalFilename();
-        this.storedFilename = file.getStoredFilename();  // ✅ 추가 (선택사항)
-        this.url = "/uploads/" + file.getStoredFilename();
+        this.storedFilename = file.getStoredFilename();
+        this.url = file.getUrl(); // ✅ 실제 접근 URL로 교체
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
+    }
+
+    public String getStoredFilename() {
+        return storedFilename;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
