@@ -4,17 +4,15 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
-import org.example.demo3.global.util.ImageResizeUtil;
+import org.example.demo3.global.util.ImageProcessUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,58 +28,56 @@ public class S3FileUploader implements FileUploader {
     @Value("${cloud.aws.s3.bucket}")
     private String s3BucketName;
 
-    @Value("${cloudfront-url}")
+    @Value("${cloudfront.url}")
     private String cloudFrontUrl;
 
     @Override
     public File storeFile(MultipartFile multipartFile) throws IOException {
         String originalFilename = multipartFile.getOriginalFilename();
-        String extension = originalFilename != null && originalFilename.contains(".")
-                ? originalFilename.substring(originalFilename.lastIndexOf('.') + 1)
-                : "jpg"; // fallback
-
         String uuid = UUID.randomUUID().toString();
-        String storedFilename = uuid + "." + extension; // ✅ 원본 확장자 유지
-        String s3Key = "uploads/" + storedFilename;
 
-        byte[] bytes;
+        byte[] fileBytes;
+        String storedFilename;
         String contentType;
 
-        // ✅ 이미지라면 리사이징만 적용
-        if (multipartFile.getContentType() != null && multipartFile.getContentType().startsWith("image")) {
-            BufferedImage resizedImage = ImageResizeUtil.resize(multipartFile, 1080);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-            // ✅ 원본 포맷으로 저장
-            ImageIO.write(resizedImage, extension, os);
-
-            bytes = os.toByteArray();
-            contentType = multipartFile.getContentType();
+        if (ImageProcessUtil.isImage(multipartFile)) {
+            BufferedImage resizedImage = ImageProcessUtil.resizeToBufferedImage(multipartFile, 400);
+            try {
+                fileBytes = ImageProcessUtil.convertToWebPUsingCLI(resizedImage, 0.8f); // CLI 기반 WebP 변환
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("WebP 변환 중 인터럽트 발생", e);
+            }
+            storedFilename = uuid + ".webp";
+            contentType = "image/webp";
         } else {
-            // 일반 파일
-            bytes = multipartFile.getBytes();
+            fileBytes = multipartFile.getBytes();
+            storedFilename = uuid + "." + ImageProcessUtil.getExtension(originalFilename).orElse("bin");
             contentType = multipartFile.getContentType();
         }
 
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+        String s3Key = "uploads/" + storedFilename;
+
+        // S3 업로드
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(bytes.length);
+        metadata.setContentLength(fileBytes.length);
         metadata.setContentType(contentType);
 
-        amazonS3.putObject(s3BucketName.trim(), s3Key, is, metadata);
+        amazonS3.putObject(s3BucketName.trim(), s3Key, new ByteArrayInputStream(fileBytes), metadata);
 
         return File.builder()
                 .originalFilename(originalFilename)
                 .storedFilename(storedFilename)
                 .filePath(s3Key)
-                .size((long) bytes.length)
+                .size((long) fileBytes.length)
                 .contentType(contentType)
                 .uploadedAt(LocalDateTime.now())
-                .url(cloudFrontUrl + "/" +s3Key)
+                .url(cloudFrontUrl + "/" + s3Key)
                 .build();
     }
-
 }
+
+
 
 
 

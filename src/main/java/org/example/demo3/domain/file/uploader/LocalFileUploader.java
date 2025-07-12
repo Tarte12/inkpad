@@ -2,15 +2,13 @@ package org.example.demo3.domain.file.uploader;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
-import org.example.demo3.global.util.ImageResizeUtil;
+import org.example.demo3.global.util.ImageProcessUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,43 +25,48 @@ public class LocalFileUploader implements FileUploader {
 
     @Override
     public File storeFile(MultipartFile multipartFile) throws IOException {
-        ImageIO.scanForPlugins();
         String originalFilename = multipartFile.getOriginalFilename();
         String uuid = UUID.randomUUID().toString();
-        String storedFilename = uuid + ".webp";
-        String fullPath = uploadDir + storedFilename;
 
-        byte[] bytes;
+        byte[] fileBytes;
+        String storedFilename;
         String contentType;
 
-        if (multipartFile.getContentType() != null && multipartFile.getContentType().startsWith("image")) {
-            BufferedImage resizedImage = ImageResizeUtil.resize(multipartFile, 1080);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            boolean written = ImageIO.write(resizedImage, "webp", os);
-            if (!written) {
-                throw new IOException("WebP 변환 실패: ImageIO.write 실패");
+        if (ImageProcessUtil.isImage(multipartFile)) {
+            BufferedImage resizedImage = ImageProcessUtil.resizeToBufferedImage(multipartFile, 1080);
+            try {
+                fileBytes = ImageProcessUtil.convertToWebPUsingCLI(resizedImage, 0.8f);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("WebP 변환 중 인터럽트 발생", e);
             }
-            bytes = os.toByteArray();
+            storedFilename = uuid + ".webp";
             contentType = "image/webp";
         } else {
-            bytes = multipartFile.getBytes();
+            fileBytes = multipartFile.getBytes();
+            String extension = ImageProcessUtil.getExtension(originalFilename).orElse("bin");
+            storedFilename = uuid + "." + extension;
             contentType = multipartFile.getContentType();
         }
 
-        java.io.File outputFile = new java.io.File(fullPath);
-        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(outputFile)) {
-            fos.write(bytes);
+        String fullPath = uploadDir + storedFilename;
+
+        // 파일 저장
+        try (FileOutputStream fos = new FileOutputStream(fullPath)) {
+            fos.write(fileBytes);
         }
 
         return File.builder()
                 .originalFilename(originalFilename)
                 .storedFilename(storedFilename)
                 .filePath(fullPath)
-                .size((long) bytes.length)
+                .size((long) fileBytes.length)
                 .contentType(contentType)
                 .uploadedAt(LocalDateTime.now())
-                .url(localBaseUrl + "/uploads/" + storedFilename)  // ✅ CDN 또는 프론트에서 접근 가능한 URL
+                .url(localBaseUrl + "/uploads/" + storedFilename)
                 .build();
     }
 }
+
+
 
