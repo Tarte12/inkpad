@@ -19,6 +19,7 @@ public class Notice {
     private String content;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 10) // "NORMAL", "HIGH", "LOW" 모두 저장 가능
     private Importance importance;
 
     private LocalDate publishedAt;
