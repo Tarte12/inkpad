@@ -2,6 +2,8 @@ package org.example.demo3.domain.file.uploader;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.file.File;
+import org.example.demo3.domain.file.FileType;
+import org.example.demo3.global.util.FileTypeUtil;
 import org.example.demo3.global.util.ImageProcessUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,9 +34,11 @@ public class LocalFileUploader implements FileUploader {
         byte[] fileBytes;
         String storedFilename;
         String contentType;
+        FileType fileType;
 
-        if (ImageProcessUtil.isImage(multipartFile)) {
-            BufferedImage resizedImage = ImageProcessUtil.resizeToBufferedImage(multipartFile, 1080);
+        // ✅ 이미지 처리: 리사이즈 + WebP 변환
+        if (FileTypeUtil.isImage(multipartFile)) {
+            BufferedImage resizedImage = ImageProcessUtil.resizeToBufferedImage(multipartFile, 400);
             try {
                 fileBytes = ImageProcessUtil.convertToWebPUsingCLI(resizedImage, 0.8f);
             } catch (InterruptedException e) {
@@ -42,31 +47,53 @@ public class LocalFileUploader implements FileUploader {
             }
             storedFilename = uuid + ".webp";
             contentType = "image/webp";
-        } else {
-            fileBytes = multipartFile.getBytes();
-            String extension = ImageProcessUtil.getExtension(originalFilename).orElse("bin");
-            storedFilename = uuid + "." + extension;
-            contentType = multipartFile.getContentType();
+            fileType = FileType.IMAGE;
         }
 
-        String fullPath = uploadDir + storedFilename;
+        // ✅ 엑셀 파일 처리
+        else if (FileTypeUtil.isExcel(multipartFile)) {
+            fileBytes = multipartFile.getBytes();
+            storedFilename = uuid + ".xlsx";
+            contentType = FileTypeUtil.getContentType(multipartFile);
+            fileType = FileType.EXCEL;
+        }
 
-        // 파일 저장
-        try (FileOutputStream fos = new FileOutputStream(fullPath)) {
+        // ✅ PDF 파일 처리
+        else if (FileTypeUtil.isPdf(multipartFile)) {
+            fileBytes = multipartFile.getBytes();
+            storedFilename = uuid + ".pdf";
+            contentType = FileTypeUtil.getContentType(multipartFile);
+            fileType = FileType.PDF;
+        }
+
+        // ✅ 그 외 파일 처리
+        else {
+            fileBytes = multipartFile.getBytes();
+            String ext = FileTypeUtil.getExtension(originalFilename).orElse("bin");
+            storedFilename = uuid + "." + ext;
+            contentType = FileTypeUtil.getContentType(multipartFile);
+            fileType = FileType.OTHER;
+        }
+
+        // ✅ 로컬 파일 저장
+        String filePath = Paths.get(uploadDir, storedFilename).toString();
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
             fos.write(fileBytes);
         }
 
         return File.builder()
                 .originalFilename(originalFilename)
                 .storedFilename(storedFilename)
-                .filePath(fullPath)
+                .filePath(filePath)
                 .size((long) fileBytes.length)
                 .contentType(contentType)
                 .uploadedAt(LocalDateTime.now())
-                .url(localBaseUrl + "/uploads/" + storedFilename)
+                .url(localBaseUrl + "/" + storedFilename)
+                .fileType(fileType)
                 .build();
     }
 }
+
 
 
 

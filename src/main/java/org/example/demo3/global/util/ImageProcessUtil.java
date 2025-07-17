@@ -7,8 +7,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Optional;
 
 public class ImageProcessUtil {
 
@@ -85,21 +83,5 @@ public class ImageProcessUtil {
 
         return result;
     }
-
-    /**
-     * 파일 확장자 추출
-     */
-    public static Optional<String> getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return Optional.empty();
-        return Optional.of(filename.substring(filename.lastIndexOf('.') + 1).toLowerCase());
-    }
-
-    /**
-     * 이미지 MIME 타입 여부
-     */
-    public static boolean isImage(MultipartFile file) {
-        return file.getContentType() != null && file.getContentType().startsWith("image");
-    }
 }
-
 
