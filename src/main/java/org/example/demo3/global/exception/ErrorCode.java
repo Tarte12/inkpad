@@ -33,6 +33,9 @@ public enum ErrorCode {
     UNSUPPORTED_FILE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일이 존재하지 않습니다."),
 
+    // ✅ 🧾 엑셀 업로드 관련
+    INVALID_EXCEL_ROW(HttpStatus.BAD_REQUEST, "엑셀 행의 데이터가 유효하지 않습니다."),
+
     // ⚙️ 공통 / 시스템
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "요청 값이 올바르지 않습니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),

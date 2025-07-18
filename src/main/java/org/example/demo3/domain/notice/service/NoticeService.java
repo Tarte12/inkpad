@@ -9,6 +9,7 @@ import org.example.demo3.domain.notice.dto.NoticeExcelRow;
 import org.example.demo3.domain.notice.dto.NoticeResponseDto;
 import org.example.demo3.domain.notice.dto.NoticeUpdateDto;
 import org.example.demo3.domain.notice.repository.NoticeRepository;
+import org.example.demo3.global.exception.BlogException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.example.demo3.global.exception.ErrorCode;
+import org.example.demo3.domain.notice.validation.ExcelRowValidator;
+
+
 
 @Slf4j
 @Service
@@ -30,27 +36,60 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
 
      //엑셀 업로드 시 기존 데이터 초기화 후 일괄 저장
-    @Transactional
-    public void saveAllFromExcel(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            // 1. 엑셀 파싱
-            List<NoticeExcelRow> rows = EasyExcel.read(inputStream)
-                    .head(NoticeExcelRow.class)
-                    .sheet()
-                    .doReadSync();
+     @Transactional
+     public void saveAllFromExcel(MultipartFile file) throws IOException {
+         try (InputStream inputStream = file.getInputStream()) {
+             // 1. 엑셀 파싱
+             List<NoticeExcelRow> rows = EasyExcel.read(inputStream)
+                     .head(NoticeExcelRow.class)
+                     .sheet()
+                     .doReadSync();
 
-            // 2. 기존 데이터 초기화
-            noticeRepository.deleteAllInBatch();
+             // 2. 기존 데이터 초기화
+             noticeRepository.deleteAllInBatch();
 
-            // 3. 변환 및 저장
-            List<Notice> notices = rows.stream()
-                    .map(this::convertToEntity)
-                    .collect(Collectors.toList());
+             // 3. 유효성 검사 + 변환 + 저장
+             List<Notice> notices = new ArrayList<>(); // ✅ 리스트 선언
 
-            noticeRepository.saveAll(notices);
-            log.info("✅ 총 {}건 공지사항이 새로 업로드되었습니다.", notices.size());
-        }
-    }
+             for (NoticeExcelRow row : rows) {
+                 // ✅ 유효성 검사
+                 ExcelRowValidator.validate(row);
+
+                 try {
+                     // ✅ Enum/날짜 파싱
+                     Importance importance = Importance.valueOf(row.getImportance().trim().toUpperCase());
+
+                     Notice notice = Notice.builder()
+                             .title(row.getTitle())
+                             .content(row.getContent())
+                             .importance(importance)
+                             .publishedAt(LocalDate.now())
+                             .createdAt(LocalDateTime.now())
+                             .build();
+
+                     // ✅ 리스트에 추가
+                     notices.add(notice);
+
+                 } catch (Exception e) {
+                     throw new BlogException(ErrorCode.INVALID_EXCEL_ROW);
+                 }
+             }
+
+             // ✅ 일괄 저장
+             noticeRepository.saveAll(notices);
+             log.info("✅ 총 {}건 공지사항이 새로 업로드되었습니다.", notices.size());
+
+         } catch (BlogException e) {
+             // ✅ 우리가 정의한 예외는 다시 던짐 → 전역 핸들러에서 처리됨
+             throw e;
+
+         } catch (Exception e) {
+             // ✅ 예기치 못한 예외는 내부 서버 에러로 래핑
+             throw new BlogException(ErrorCode.INTERNAL_SERVER_ERROR);
+         }
+     }
+
+
 
     /**
      * ✅ 엑셀 row → Notice entity 변환
