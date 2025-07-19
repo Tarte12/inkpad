@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(new ErrorResponse(errorCode.name(), errorCode.getMessage()));
+                .body(new ErrorResponse(errorCode.name(), e.getMessage()));
     }
 
     // 예상 못 한 예외 처리 -> 안전망 역할

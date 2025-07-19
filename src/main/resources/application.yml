@@ -38,6 +38,7 @@ spring:
 
 logging:
   level:
+    root: info #전체 로그 레벨 info로 설정
     #    org.springframework.security.web: trace
     #    org.hibernate: info # Hibernate? ?? ??? info? ??
     org.hibernate.SQL: debug # Hibernate? SQL? ??

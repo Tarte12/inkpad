@@ -48,46 +48,21 @@ public class NoticeService {
              // 2. 기존 데이터 초기화
              noticeRepository.deleteAllInBatch();
 
-             // 3. 유효성 검사 + 변환 + 저장
-             List<Notice> notices = new ArrayList<>(); // ✅ 리스트 선언
-
+             // 3. 유효성 검사
              for (NoticeExcelRow row : rows) {
-                 // ✅ 유효성 검사
                  ExcelRowValidator.validate(row);
-
-                 try {
-                     // ✅ Enum/날짜 파싱
-                     Importance importance = Importance.valueOf(row.getImportance().trim().toUpperCase());
-
-                     Notice notice = Notice.builder()
-                             .title(row.getTitle())
-                             .content(row.getContent())
-                             .importance(importance)
-                             .publishedAt(LocalDate.now())
-                             .createdAt(LocalDateTime.now())
-                             .build();
-
-                     // ✅ 리스트에 추가
-                     notices.add(notice);
-
-                 } catch (Exception e) {
-                     throw new BlogException(ErrorCode.INVALID_EXCEL_ROW);
-                 }
              }
 
-             // ✅ 일괄 저장
-             noticeRepository.saveAll(notices);
-             log.info("✅ 총 {}건 공지사항이 새로 업로드되었습니다.", notices.size());
+             // 4. 저장 + 로그 → 공통 메서드 호출
+             saveAll(rows);
 
          } catch (BlogException e) {
-             // ✅ 우리가 정의한 예외는 다시 던짐 → 전역 핸들러에서 처리됨
              throw e;
-
          } catch (Exception e) {
-             // ✅ 예기치 못한 예외는 내부 서버 에러로 래핑
              throw new BlogException(ErrorCode.INTERNAL_SERVER_ERROR);
          }
      }
+
 
 
 
@@ -122,6 +97,8 @@ public class NoticeService {
                 .collect(Collectors.toList());
 
         noticeRepository.saveAll(notices);
+
+        log.info("✅ 공지사항 업로드 시도: {}건, 성공: {}건", rows.size(), notices.size());
     }
 
     //공지사항 목록 조회
