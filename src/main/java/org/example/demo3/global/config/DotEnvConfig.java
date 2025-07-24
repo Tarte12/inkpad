@@ -1,4 +1,4 @@
-package org.example.demo3.config;
+package org.example.demo3.global.config;
 
 
 import io.github.cdimascio.dotenv.Dotenv;

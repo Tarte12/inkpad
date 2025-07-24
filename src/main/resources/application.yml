@@ -34,6 +34,9 @@ spring:
         format_sql: true # SQL ???
         highlight_sql: true # ????? SQL ??
         use_sql_comments: true # ?? JPQL SQL ?? ??
+  security:
+    filter:
+      dispatcher-types: ASYNC, REQUEST, ERROR
 
 
 logging:
@@ -68,4 +71,11 @@ uploader:
 #이미지 최적화를 위한 CDN 관련
 cloudfront:
   url: https://dpawjnwrq42z8.cloudfront.net
+
+# 인증 jwt
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+#spring.security 자동 설정 무력화
 

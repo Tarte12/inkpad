@@ -3,7 +3,7 @@ package org.example.demo3.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
-import org.example.demo3.domain.user.dto.UserRequestDto;
+import org.example.demo3.domain.user.dto.SignupRequestDto;
 import org.example.demo3.domain.user.dto.UserUpdateDto;
 import org.example.demo3.domain.user.repository.UserRepository;
 import org.example.demo3.global.exception.BlogException;
@@ -21,7 +21,7 @@ public class UserService {
     private  final UserRepository userRepository;
     //repository에서 db 땡겨와야 해서 쓰는 코드인지?
 
-    public User create(UserRequestDto dto){
+    public User create(SignupRequestDto dto){
         User user = User.builder()
                 .username(dto.getUsername())
                 .password(dto.getPassword()) // 실무라면 passwordEncoder.encode(dto.getPassword())!

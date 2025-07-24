@@ -1,8 +1,9 @@
 package org.example.demo3.domain.notice.controller;
 
-import com.alibaba.excel.EasyExcel;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.example.demo3.domain.notice.dto.NoticeExcelRow;
 import org.example.demo3.domain.notice.dto.NoticeResponseDto;
 import org.example.demo3.domain.notice.dto.NoticeUpdateDto;
 import org.example.demo3.domain.notice.service.NoticeService;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
+@Tag(name = "Notice", description = "공지사항 업로드 및 관리 API")
 @RestController
 @RequestMapping("/notices")
 @RequiredArgsConstructor
@@ -23,16 +24,17 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-    //공지사항 업로드
-    //테스트 후 예외처리 만들어 줘야 함
+    @Operation(summary = "공지사항 Excel 업로드", description = "Excel 파일(.xlsx)을 업로드하여 공지사항을 등록")
 // ✅ Controller
     @PostMapping("/upload")
-    public ResponseEntity<Void> uploadExcel(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<Void> uploadExcel(
+            @Parameter(description = "업로드할 Excel 파일", required = true)
+            @RequestParam("file") MultipartFile file) throws IOException {
         noticeService.saveAllFromExcel(file);
         return ResponseEntity.ok().build();
     }
 
-
+    @Operation(summary = "공지사항 목록 조회", description = "공지사항 리스트를 페이지네이션 형태로 조회")
     @GetMapping
     public ResponseEntity<Page<NoticeResponseDto>> getNotices(
             @PageableDefault(size = 10, sort = "publishedAt") Pageable pageable
@@ -40,13 +42,13 @@ public class NoticeController {
         return ResponseEntity.ok(noticeService.getNoticeList(pageable));
     }
 
-    //공지사항 상세 조회
+    @Operation(summary = "공지사항 단건 조회", description = "ID를 통해 공지사항 상세 내용을 조회")
     @GetMapping("/{id}")
     public ResponseEntity<NoticeResponseDto> getNotice(@PathVariable Long id) {
         return ResponseEntity.ok(noticeService.getNoticeById(id));
     }
 
-    //공지사항 단건 수정
+    @Operation(summary = "공지사항 단건 수정", description = "ID를 통해 공지사항 내용을 수정")
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateNotice(
             @PathVariable Long id,
@@ -56,7 +58,7 @@ public class NoticeController {
         return ResponseEntity.ok().build();
     }
 
-    //공지사항 단건 삭제
+    @Operation(summary = "공지사항 단건 삭제", description = "ID를 통해 공지사항을 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
         noticeService.deleteNotice(id);

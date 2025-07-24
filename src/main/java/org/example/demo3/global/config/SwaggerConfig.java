@@ -1,4 +1,4 @@
-package org.example.demo3.config;   // ← 실제 경로에 맞게 변경
+package org.example.demo3.global.config;   // ← 실제 경로에 맞게 변경
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

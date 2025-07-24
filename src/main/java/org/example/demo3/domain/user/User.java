@@ -12,10 +12,19 @@ public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String password;
+    private String username; //자체 회원가입용 ID
+    private String password; //암호화된 비밀번호
     private String nickname;
     private String email;
+
+    //소셜 로그인용 필드 추가
+    private String provider; //구글, 카카오, 네이버
+    private String providerId; //소셜에서 제공하는 고유 사용자 ID
+
+    //소셜 유저인지 체크
+    public boolean isSocialUser(){
+        return this.provider != null && !this.provider.isBlank();
+    }
 
     //DB에 최종적으로 "바꾼 값"을 반영할 때 엔티티 내부에서 실행하는 메서드
     public void update(String password, String nickname, String email) {

@@ -62,10 +62,6 @@ public class NoticeService {
              throw new BlogException(ErrorCode.INTERNAL_SERVER_ERROR);
          }
      }
-
-
-
-
     /**
      * ✅ 엑셀 row → Notice entity 변환
      */
@@ -80,8 +76,9 @@ public class NoticeService {
     }
 
     /**
-     * ✅ 파싱된 결과를 Notice 엔티티로 변환하여 DB에 저장
-     */
+     * ✅ 파싱된 결과를 Notice 엔티티로 변환하여 DB에 저장 -> 엔티티나 dto에 넣는 게 더 깔끔할 듯?
+     * 이름 수정 <- 메서드 이름 수정 필요
+     */ 
     public void saveAll(List<NoticeExcelRow> rows) {
         LocalDate now = LocalDate.now();
         LocalDateTime createdAt = LocalDateTime.now();
@@ -102,6 +99,8 @@ public class NoticeService {
     }
 
     //공지사항 목록 조회
+    //페이징 관련 DTO 만들기 <- 다른 페이징 기능도 필요
+    //페이징 자체는 요청을 해야 함 몇 번째 페이지야? 몇 개의 페이지야? 오름차순이야 내림차순이야? 페이지 번호
     public Page<NoticeResponseDto> getNoticeList(Pageable pageable) {
         return noticeRepository.findAll(pageable)
                 .map(NoticeResponseDto::from);
@@ -128,7 +127,7 @@ public class NoticeService {
     public void deleteNotice(Long id) {
         Notice notice = noticeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다."));
-        noticeRepository.delete(notice);
+        noticeRepository.delete(notice); //deleteByID로 바꾸면 더 좋을 듯
     }
 }
 
