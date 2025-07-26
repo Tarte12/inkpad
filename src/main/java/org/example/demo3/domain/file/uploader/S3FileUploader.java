@@ -109,6 +109,16 @@ public class S3FileUploader implements FileUploader {
                 .fileType(fileType)
                 .build();
     }
+
+    // S3FileUploader.java 안에 추가해 줘야 하는 setter
+    public void setS3BucketName(String s3BucketName) {
+        this.s3BucketName = s3BucketName;
+    }
+
+    public void setCloudFrontUrl(String cloudFrontUrl) {
+        this.cloudFrontUrl = cloudFrontUrl;
+    }
+
 }
 
 

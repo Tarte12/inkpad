@@ -83,5 +83,15 @@ public class ImageProcessUtil {
 
         return result;
     }
+
+    /**
+     * BufferedImage를 byte[]로 변환합니다 (테스트용 또는 일반 저장용).
+     */
+    public static byte[] bufferedImageToBytes(BufferedImage image, String formatName) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(image, formatName, baos);
+            return baos.toByteArray();
+        }
+    }
 }
 

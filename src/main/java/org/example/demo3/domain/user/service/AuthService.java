@@ -2,13 +2,15 @@ package org.example.demo3.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.user.User;
+import org.example.demo3.domain.user.UserRole;
 import org.example.demo3.domain.user.dto.SignupRequestDto;
 import org.example.demo3.domain.user.repository.UserRepository;
 import org.example.demo3.global.exception.BlogException;
 import org.example.demo3.global.exception.ErrorCode;
-import org.example.demo3.global.jwt.JwtTokenProvider;
+import org.example.demo3.global.security.jwt.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Optional;
 
@@ -44,6 +46,7 @@ public class AuthService {
                     .provider(dto.getProvider())
                     .providerId(dto.getProviderId())
                     .password("") // 소셜 유저는 패스워드 없음
+                    .role(UserRole.USER)
                     .build();
 
             userRepository.save(socialUser);
@@ -62,9 +65,28 @@ public class AuthService {
                 .password(encryptedPassword)
                 .nickname(dto.getNickname())
                 .email(dto.getEmail())
+                .role(UserRole.USER)
                 .build();
 
+        System.out.println("User role before saving: " + user.getRole());
+
         userRepository.save(user);
+    }
+
+    @PostMapping("/admin/signup")
+    public User signupAdmin(SignupRequestDto dto){
+        User admin = User.builder()
+                .username(dto.getUsername())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .nickname(dto.getNickname())
+                .email(dto.getEmail())
+                .role(UserRole.ADMIN)
+                .build();
+
+        // 저장 전 user 객체의 role 값을 확인해볼 수 있습니다.
+        System.out.println("User role before saving: " + admin.getRole());
+
+        return userRepository.save(admin);
     }
 
     public String login(String username, String rawPassword) {

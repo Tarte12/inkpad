@@ -40,6 +40,21 @@ public class AuthController {
     }
 
     @Operation(
+            summary = "관리자 회원가입",
+            description = "관리자 계정으로 회원가입을 수행. 관리자 권한이 부여됩니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "관리자 회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "유효성 검사 실패"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/admin/signup")
+    public ResponseEntity<Void> signupAdmin(@RequestBody @Valid SignupRequestDto dto) {
+        authService.signupAdmin(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "로그인",
             description = "사용자로부터 username과 password를 입력받아 로그인을 수행하고 JWT 토큰을 발급"
     )

@@ -3,12 +3,16 @@ package org.example.demo3.domain.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "회원 정보 수정 DTO")
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class UserUpdateDto {
 
     //ID, username은 바꿀 수 없게 할 것이기 때문에 제외

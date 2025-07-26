@@ -92,6 +92,16 @@ public class LocalFileUploader implements FileUploader {
                 .fileType(fileType)
                 .build();
     }
+
+    // 테스트용 setter
+    public void setUploadDir(String uploadDir) {
+        this.uploadDir = uploadDir;
+    }
+
+    public void setLocalBaseUrl(String localBaseUrl) {
+        this.localBaseUrl = localBaseUrl;
+    }
+
 }
 
 

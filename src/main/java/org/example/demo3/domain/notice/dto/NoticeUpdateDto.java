@@ -1,15 +1,15 @@
 package org.example.demo3.domain.notice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.demo3.domain.notice.Importance;
 
 @Schema(description = "공지사항 수정 요청 DTO")
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class NoticeUpdateDto {
 
     @Schema(description = "공지 제목", example = "서비스 점검 안내")

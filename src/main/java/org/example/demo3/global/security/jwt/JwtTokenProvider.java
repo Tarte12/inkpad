@@ -1,4 +1,4 @@
-package org.example.demo3.global.jwt;
+package org.example.demo3.global.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -23,6 +23,8 @@ public class JwtTokenProvider {
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        System.out.println("✅ JWT Secret: " + secret);
+        System.out.println("✅ Expiration: " + expiration);
     }
 
     /**
@@ -47,6 +49,14 @@ public class JwtTokenProvider {
     public Long getUserIdFromToken(String token) {
         Claims claims = parseClaims(token);
         return claims.get("userId", Long.class);
+    }
+
+    /**
+     * JWT에서 username(subject) 추출
+     */
+    public String getUsernameFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.getSubject();  // username을 setSubject()에 넣었기 때문에 이렇게 추출 가능
     }
 
     /**

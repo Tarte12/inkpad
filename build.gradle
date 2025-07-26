@@ -18,6 +18,9 @@ configurations {
         extendsFrom annotationProcessor
     }
 }
+springBoot {
+    mainClass = 'org.example.demo3.Demo3Application' // ← 너의 실제 main 클래스 전체 경로로 수정
+}
 
 repositories {
     mavenCentral()
@@ -61,6 +64,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // test에서 lombok 사용
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 

@@ -3,10 +3,10 @@ package org.example.demo3.domain.user;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Getter
 @Builder
 public class User {
 
@@ -16,6 +16,10 @@ public class User {
     private String password; //암호화된 비밀번호
     private String nickname;
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false) //null 저장 방지
+    private UserRole role; //권한 분리 위해 역할 부여
 
     //소셜 로그인용 필드 추가
     private String provider; //구글, 카카오, 네이버

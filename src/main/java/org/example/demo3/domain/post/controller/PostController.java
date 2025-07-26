@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.demo3.domain.post.dto.*;
 import org.example.demo3.domain.post.service.PostService;
+import org.example.demo3.global.security.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,10 +48,9 @@ public class PostController {
             @Parameter(description = "업로드할 파일 리스트 (선택)", required = false)
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws Exception {
-        Long mockUserId = 1L;
-
+        Long userId = SecurityUtil.getCurrentUserId();
         PostRequestDto postDto = objectMapper.readValue(postJson, PostRequestDto.class);
-        postService.createPost(mockUserId, postDto, files);
+        postService.createPost(userId, postDto, files);
         return ResponseEntity.ok().build();
     }
 
@@ -69,7 +69,6 @@ public class PostController {
         return ResponseEntity.ok(postService.findAllPaged(pageable));
     }
 
-    // 3. 글 단건 조회
     @Operation(summary = "게시글 단건 조회", description = "게시글 ID를 기준으로 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 조회 성공"),
@@ -103,7 +102,8 @@ public class PostController {
             @Parameter(description = "첨부 파일 목록", required = false)
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws Exception {
-        postService.update(id, dto, files);
+        Long userId = SecurityUtil.getCurrentUserId(); // 또는 커스텀 UserDetails에서 getId()
+        postService.update(id, userId, dto, files);
         return ResponseEntity.ok().build();
     }
 
@@ -115,10 +115,9 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "게시글 ID", example = "1")
-            @PathVariable Long id) {
-        postService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Long userId = SecurityUtil.getCurrentUserId(); // ✅ 운영용
+        postService.delete(id, userId);
         return ResponseEntity.ok().build();
     }
 
