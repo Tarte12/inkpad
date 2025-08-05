@@ -39,7 +39,7 @@ out/
 ### VS Code ###
 .vscode/
 
-.env(real)
+.env
 
 # QueryDSL Q클래스 경로
 /src/main/generated/.env
