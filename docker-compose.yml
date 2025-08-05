@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8
+    container_name: mysql_db
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # MySQL 루트 비밀번호
+      MYSQL_DATABASE: ${MYSQL_DATABASE}           # 기본 생성할 데이터베이스 이름
+      MYSQL_USER: ${MYSQL_USER}                   # 사용자 이름
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}           # 사용자 비밀번호
+      TZ: Asia/Seoul                              # 타임존 설정
+    ports:
+      - "3307:3306"                                # 호스트 포트 3307 -> 컨테이너 포트 3306
+    volumes:
+      - ./mysql/data:/var/lib/mysql               # 데이터 퍼시스턴스를 위한 볼륨
+      - ./mysql/conf.d:/etc/mysql/conf.d          # MySQL 설정 파일
+      - ./mysql/initdb:/docker-entrypoint-initdb.d # 초기화 SQL 스크립트
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_general_ci"
+    networks:
+      - spring-net
+
+  spring_app:
+    env_file:
+      - .env
+    build:
+      context: .                 # ← 여기에 오타 있었음 (: 제거)
+      dockerfile: Dockerfile
+    container_name: spring_app
+    ports:
+      - "8090:8090"              # 외부 → 내부 포트 매핑
+    depends_on:
+      - mysql_db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - spring-net
+
+networks:
+  spring-net:
+    driver: bridge

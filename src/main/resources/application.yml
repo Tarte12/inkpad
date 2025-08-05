@@ -1,0 +1,93 @@
+server:
+  port: 8090
+
+spring:
+  #Spring AI 관련
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://api.openai.com
+      chat:
+        options:
+          model: gpt-3.5-turbo
+          temperature: 0.7
+
+  config:
+    import:
+    - optional:file:.env[.properties] # ???? ?? ??
+
+  output:
+    ansi:
+      enabled: always # ANSI ?? ?? ??? (JUnit ??? ??)
+  #파일 용량
+  servlet:
+    multipart:
+      max-file-size: 50MB #파일 하나당 최대 크기
+      max-request-size: 100MB #요청 전체의 최대 크기
+      # S3 써서 저장 용량 해결해야 할 듯?
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/test?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    #username: root
+    #password: 1234
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+
+
+  jpa:
+    open-in-view: false # controller ?? ????? ??? ? false? ??
+    hibernate:
+      ddl-auto: update # ??? ?? ? ???? ?? (create, create-drop, update, validate, none)
+    properties:
+      hibernate:
+        format_sql: true # SQL ???
+        highlight_sql: true # ????? SQL ??
+        use_sql_comments: true # ?? JPQL SQL ?? ??
+  security:
+    filter:
+      dispatcher-types: ASYNC, REQUEST, ERROR
+
+
+logging:
+  level:
+    root: info #전체 로그 레벨 info로 설정
+    #    org.springframework.security.web: trace
+    #    org.hibernate: info # Hibernate? ?? ??? info? ??
+    org.hibernate.SQL: debug # Hibernate? SQL? ??
+    org.hibernate.orm.jdbc.bind: trace # Hibernate? SQL ???? ??
+    org.hibernate.orm.jdbc.extract: trace # Hibernate? SQL ???? ??
+    org.springframework.transaction.interceptor: trace # Hibernate? SQL ???? ??
+
+file:
+  upload-dir: uploads/
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+    s3:
+      bucket: ${S3_BUCKET}
+
+# ✅ S3FileUploader 등록 여부 제어
+uploader:
+  s3:
+    enabled: true #local로 바꿀 떄 false
+  local-base-url: http://localhost:8090
+
+#이미지 최적화를 위한 CDN 관련
+cloudfront:
+  url: https://dpawjnwrq42z8.cloudfront.net
+
+# 인증 jwt
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+#spring.security 자동 설정 무력화
+
+
+
